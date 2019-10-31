@@ -1,1 +1,98 @@
+// method 1:
 
+class Solution {
+    
+    private class EndPoint implements Comparable<EndPoint> {
+        public int x, height;
+        public boolean isEnd;
+        
+        public EndPoint(int x, int height, boolean isEnd) {
+            this.x = x;
+            this.height = height;
+            this.isEnd = isEnd;
+        }
+        
+        @Override
+        public int compareTo(EndPoint that) {
+            if(this.x != that.x) {
+                return this.x - that.x;
+            } else {
+                if(!this.isEnd && !that.isEnd) { // both left points : first high
+                    return that.height - this.height;
+                } else if(this.isEnd && that.isEnd) { // both right points: first low
+                    return this.height - that.height;
+                } else { // one left and one right point : first left point
+                    return this.isEnd ? 1 : -1;
+                }
+            }
+        }  
+    }
+    
+    public List<List<Integer>> getSkyline(int[][] buildings) {
+        List<List<Integer>> res = new ArrayList<>();
+        if(buildings.length == 0 || buildings[0].length == 0)
+            return res;
+        
+        List<EndPoint> endPoints = new ArrayList<>();
+        for(int[] b : buildings) {
+            endPoints.add(new EndPoint(b[0], b[2], false));
+            endPoints.add(new EndPoint(b[1], b[2], true));
+        }
+        
+        Collections.sort(endPoints);
+        
+        // maxHeap
+        Queue<Integer> heap = new PriorityQueue<>(buildings.length, new Comparator<Integer>(){
+            public int compare(Integer i1, Integer i2) {
+                return i2-i1;
+            }
+        });
+        
+        for(EndPoint ep : endPoints) {
+            if(!ep.isEnd) {  // left point
+                if(heap.isEmpty() || ep.height > heap.peek()) {
+                    // res.add(new int[]{ep, x, ep.height});
+                    res.add(Arrays.asList(ep.x, ep.height));
+                }
+                heap.offer(ep.height);
+            } else {  // right point
+                heap.remove(ep.height);
+                if(heap.isEmpty() || ep.height > heap.peek()) {
+                   
+                    res.add(Arrays.asList(ep.x, heap.isEmpty() ? 0:heap.peek()));
+                }
+            }
+        }
+        return res;
+    }
+}
+
+
+// method 2:
+class Solution {
+    public List<List<Integer>> getSkyline(int[][] buildings) {
+        List<List<Integer>> result = new ArrayList<>();
+        List<int[]> height = new ArrayList<>();
+        
+        for (int[] p: buildings) {
+        	// buildings: [[x_start, x_end, height], ...]
+        	height.add(new int[] {p[0], -p[2]});
+        	height.add(new int[] {p[1], p[2]});
+        }
+        Collections.sort(height, (a, b)->a[0]==b[0]?a[1]-b[1]:a[0]-b[0]);
+        Queue<Integer> pq = new PriorityQueue<>((a,b) -> (b-a));
+        pq.add(0);
+        
+        int pre = 0;
+        for (int[] h: height) {
+        	if (h[1] < 0) pq.add(-h[1]);
+        	else pq.remove(h[1]);
+        	
+        	if (pq.peek() != pre) {
+        		result.add(new ArrayList<Integer>(Arrays.asList(h[0], pq.peek())));
+        		pre = pq.peek();
+        	}
+        }
+        return result;
+    }
+}
