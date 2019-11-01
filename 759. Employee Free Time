@@ -1,3 +1,33 @@
+// method 1:
+
+class Solution {
+    public List<Interval> employeeFreeTime(List<List<Interval>> schedule) {
+        PriorityQueue<Interval> que = new PriorityQueue<>((a, b) -> a.start - b.start);
+         
+        for (List<Interval> list : schedule) {
+            for (Interval i : list) {
+                que.add(i);
+            }
+        }
+         
+        List<Interval> rt = new ArrayList<>();
+        int max = -1;
+        while (!que.isEmpty()) {
+            Interval top = que.poll();
+            if (max != -1 && top.start > max) {
+                rt.add(new Interval(max, top.start));
+            }
+            max = Math.max(max, top.end);
+        }
+         
+        return rt;
+    }
+}
+
+
+
+
+// method 2:
 
 class Solution {
     private static class EndPoint implements Comparable<EndPoint> {
