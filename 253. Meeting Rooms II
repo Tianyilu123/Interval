@@ -3,15 +3,15 @@ class Solution {
     public int minMeetingRooms(int[][] intervals) {
         if(intervals == null) return 0;
         List<EndPoint> list = new ArrayList<>();
-        for(int[] interval : intervals) {
+        for(int[] interval : intervals) {   // O(n)
             list.add(new EndPoint(interval[0], false));
             list.add(new EndPoint(interval[1], true));
         }
         
-        Collections.sort(list);
+        Collections.sort(list);  // O(nlogn)
         
         int count = 0, max = 0;
-        for(EndPoint ep : list) {
+        for(EndPoint ep : list) { // O(n)
             if(!ep.isEnd) {
                 count++;
             } else {
@@ -47,3 +47,6 @@ class Solution {
         }
     }
 }
+
+
+// time: O(nlogn)
